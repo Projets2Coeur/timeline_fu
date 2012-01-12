@@ -2,7 +2,6 @@ require 'rubygems'
 require 'active_record'
 require 'mocha'
 require 'test/unit'
-require 'mocha'
 require 'logger'
 
 $:.push File.expand_path("../lib", __FILE__)
