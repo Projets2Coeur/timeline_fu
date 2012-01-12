@@ -17,9 +17,10 @@ module TimelineFu
         opts[:subject] = :self unless opts.has_key?(:subject)
 
         on = opts.delete(:on)
+        callback = opts.delete(:callback)
         _if = opts.delete(:if)
         _unless = opts.delete(:unless)
-
+        
         event_class_names = Array(opts.delete(:event_class_name) || "TimelineEvent")
 
         method_name = :"fire_#{event_type}_after_#{on}"
@@ -39,7 +40,16 @@ module TimelineFu
           create_options[:event_type] = event_type.to_s
 
           event_class_names.each do |class_name|
-            class_name.classify.constantize.create!(create_options)
+            event = class_name.classify.constantize.create!(create_options)
+
+            if callback && self.respond_to?(callback)
+              if [1,-1].include?(method(callback).arity)
+                self.send(callback, event)
+              elsif method(callback).arity == 0
+                self.send(callback)
+              end
+            end
+            
           end
         end
 
